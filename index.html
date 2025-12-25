@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rafay's Scientific Calculator Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        :root {
+            --primary: #2A2D43;
+            --secondary: #1C1E2E;
+            --accent: #6C63FF;
+            --accent-light: #857EFF;
+            --danger: #FF6B8B;
+            --success: #4ECDC4;
+            --warning: #FFD166;
+            --info: #118AB2;
+            --text: #FFFFFF;
+            --text-secondary: #B0B3C1;
+            --border: #3A3D57;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --key-bg: #2E3148;
+            --key-hover: #3A3D57;
+            --key-active: #45486B;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0F0C29, #302B63, #24243E);
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            font-size: 32px;
+            color: var(--accent);
+            background: rgba(108, 99, 255, 0.1);
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .brand {
+            text-align: left;
+        }
+
+        .brand h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .brand .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .owner-tag {
+            background: linear-gradient(90deg, var(--accent), #857EFF);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+        }
+
+        .calculator-wrapper {
+            width: 100%;
+            max-width: 500px;
+            background: var(--primary);
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px var(--shadow),
+                        0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: var(--secondary);
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .mode-indicator {
+            display: flex;
+            gap: 15px;
+        }
+
+        .mode {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+        }
+
+        .mode.active {
+            color: var(--accent);
+        }
+
+        .mode.active i {
+            color: var(--accent);
+        }
+
+        .battery {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .display-area {
+            padding: 25px;
+            background: var(--secondary);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .operation-display {
+            font-size: 16px;
+            color: var(--text-secondary);
+            height: 24px;
+            overflow: hidden;
+            text-align: right;
+            margin-bottom: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            opacity: 0.9;
+        }
+
+        .result-display {
+            font-size: 42px;
+            font-weight: 300;
+            text-align: right;
+            word-wrap: break-word;
+            word-break: break-all;
+            min-height: 52px;
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text);
+            letter-spacing: 1px;
+        }
+
+        .memory-indicator {
+            position: absolute;
+            left: 25px;
+            top: 30px;
+            font-size: 12px;
+            color: var(--accent);
+            background: rgba(108, 99, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .memory-indicator.active {
+            display: block;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            padding: 25px;
+            background: var(--primary);
+        }
+
+        .key {
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: var(--key-bg);
+            color: var(--text);
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .key:hover {
+            transform: translateY(-3px);
+            background: var(--key-hover);
+            box-shadow: 0 6px 12px var(--shadow);
+        }
+
+        .key:active {
+            transform: translateY(0);
+            background: var(--key-active);
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .key::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .key:hover::after {
+            opacity: 1;
+        }
+
+        /* Key Types */
+        .key.number {
+            background: #2E3148;
+            font-size: 20px;
+        }
+
+        .key.operator {
+            background: var(--accent);
+            font-weight: 600;
+            font-size: 22px;
+        }
+
+        .key.function {
+            background: var(--info);
+            font-size: 16px;
+        }
+
+        .key.trig {
+            background: #8A4FFF;
+            font-size: 15px;
+        }
+
+        .key.equals {
+            background: linear-gradient(135deg, var(--success), #2DD4BF);
+            font-weight: 700;
+            font-size: 24px;
+            grid-column: span 2;
+        }
+
+        .key.clear {
+            background: linear-gradient(135deg, var(--danger), #FF8FA3);
+            font-weight: 600;
+        }
+
+        .key.memory {
+            background: #FF9F1C;
+            font-size: 15px;
+        }
+
+        .key.const {
+            background: #8338EC;
+            font-size: 16px;
+        }
+
+        .key.special {
+            background: #3A86FF;
+            font-size: 16px;
+        }
+
+        /* Key sizes for better UX */
+        .key.wide {
+            grid-column: span 2;
+        }
+
+        .key.tall {
+            grid-row: span 2;
+            height: 142px;
+        }
+
+        .key-label {
+            display: block;
+        }
+
+        .key-shortcut {
+            position: absolute;
+            bottom: 5px;
+            right: 8px;
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        .footer {
+            padding: 20px;
+            background: var(--secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .calculator-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calculator-model {
+            background: rgba(108, 99, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 10px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .theme-toggle {
+            background: var(--key-bg);
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            color: var(--accent);
+            background: var(--key-hover);
+        }
+
+        /* History Panel */
+        .history-panel {
+            background: var(--secondary);
+            padding: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .history-clear {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .history-item {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Consolas', monospace;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .history-expression {
+            color: var(--text-secondary);
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-result {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 16px;
+            text-align: right;
+        }
+
+        /* Mode Switch */
+        .mode-switch {
+            display: flex;
+            background: var(--key-bg);
+            border-radius: 15px;
+            padding: 5px;
+            margin: 0 25px 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 10px rgba(108, 99, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 550px) {
+            .calculator-wrapper {
+                max-width: 100%;
+            }
+            
+            .controls {
+                gap: 10px;
+                padding: 20px;
+            }
+            
+            .key {
+                height: 60px;
+                font-size: 16px;
+            }
+            
+            .key.tall {
+                height: 130px;
+            }
+            
+            .result-display {
+                font-size: 36px;
+            }
+            
+            .brand h1 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .controls {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .key.function, .key.trig {
+                font-size: 14px;
+            }
+        }
+
+        /* Animation */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(108, 99, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0); }
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Degree/Radian Indicator */
+        .angle-mode {
+            position: absolute;
+            right: 25px;
+            top: 30px;
+            font-size: 12px;
+            background: rgba(255, 209, 102, 0.1);
+            color: var(--warning);
+            padding: 4px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <div class="brand">
+                <h1>SCIENTIFIC CALCULATOR</h1>
+                <div class="subtitle">Advanced Mathematics Tool</div>
+                <div class="owner-tag">
+                    <i class="fas fa-user-tie"></i>
+                    Designed by: Rafay Mehdi
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="calculator-wrapper">
+        <div class="status-bar">
+            <div class="mode-indicator">
+                <div class="mode active">
+                    <i class="fas fa-sun"></i>
+                    <span>SCI</span>
+                </div>
+                <div class="mode">
+                    <i class="fas fa-chart-line"></i>
+                    <span>GRAPH</span>
+                </div>
+                <div class="mode">
+                    <i class="fas fa-table"></i>
+                    <span>TABLE</span>
+                </div>
+            </div>
+            <div class="battery">
+                <i class="fas fa-battery-full"></i>
+                <span>100%</span>
+            </div>
+        </div>
+
+        <div class="mode-switch">
+            <button class="mode-btn active" id="basic-mode">Basic</button>
+            <button class="mode-btn" id="scientific-mode">Scientific</button>
+            <button class="mode-btn" id="programmer-mode">Programmer</button>
+        </div>
+
+        <div class="display-area">
+            <div class="memory-indicator" id="memory-indicator">
+                <i class="fas fa-memory"></i> M
+            </div>
+            <div class="angle-mode" id="angle-mode">
+                <i class="fas fa-protractor"></i> DEG
+            </div>
+            <div class="operation-display" id="operation-display"></div>
+            <div class="result-display" id="result-display">0</div>
+        </div>
+
+        <div class="history-panel" id="history-panel">
+            <div class="history-header">
+                <div class="history-title">Calculation History</div>
+                <button class="history-clear" id="clear-history">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+            <div id="history-list"></div>
+        </div>
+
+        <div class="controls" id="basic-controls">
+            <!-- Row 1: Memory & Clear -->
+            <button class="key clear" onclick="clearAll()">
+                <span class="key-label">AC</span>
+                <span class="key-shortcut">Esc</span>
+            </button>
+            <button class="key clear" onclick="clearEntry()">
+                <span class="key-label">CE</span>
+                <span class="key-shortcut">⌫</span>
+            </button>
+            <button class="key memory" onclick="memoryClear()">
+                <span class="key-label">MC</span>
+            </button>
+            <button class="key memory" onclick="memoryRecall()">
+                <span class="key-label">MR</span>
+            </button>
+            <button class="key memory" onclick="memoryAdd()">
+                <span class="key-label">M+</span>
+            </button>
+
+            <!-- Row 2: Functions -->
+            <button class="key function" onclick="addToDisplay('Math.sqrt(')">
+                <span class="key-label">√x</span>
+                <span class="key-shortcut">R</span>
+            </button>
+            <button class="key function" onclick="addToDisplay('**2')">
+                <span class="key-label">x²</span>
+                <span class="key-shortcut">@</span>
+            </button>
+            <button class="key function" onclick="addToDisplay('**')">
+                <span class="key-label">x^y</span>
+                <span class="key-shortcut">^</span>
+            </button>
+            <button class="key function" onclick="addToDisplay('1/')">
+                <span class="key-label">1/x</span>
+                <span class="key-shortcut">I</span>
+            </button>
+            <button class="key operator" onclick="addToDisplay('/')">
+                <span class="key-label">÷</span>
+                <span class="key-shortcut">/</span>
+            </button>
+
+            <!-- Row 3: Numbers 7-9 -->
+            <button class="key number" onclick="addToDisplay('7')">
+                <span class="key-label">7</span>
+            </button>
+            <button class="key number" onclick="addToDisplay('8')">
+                <span class="key-label">8</span>
+            </button>
+            <button class="key number" onclick="addToDisplay('9')">
+                <span class="key-label">9</span>
+            </button>
+            <button class="key function" onclick="addToDisplay('%')">
+                <span class="key-label">%</span>
+                <span class="key-shortcut">%</span>
+            </button>
+            <button class="key operator" onclick="addToDisplay('*')">
+                <span class="key-label">×</span>
+                <span class="key-shortcut">*</span>
+            </button>
+
+            <!-- Row 4: Numbers 4-6 -->
+            <button class="key number" onclick="addToDisplay('4')">
+                <span class="key-label">4</span>
+            </button>
+            <button class="key number" onclick="addToDisplay('5')">
+                <span class="key-label">5</span>
+            </button>
+            <button class="key number" onclick="addToDisplay('6')">
+                <span class="key-label">6</span>
+            </button>
+            <button class="key const" onclick="addToDisplay('Math.PI')">
+                <span class="key-label">π</span>
+                <span class="key-shortcut">P</span>
+            </button>
+            <button class="key operator tall" onclick="addToDisplay('-')">
+                <span class="key-label">−</span>
+                <span class="key-shortcut">-</span>
+            </button>
+
+            <!-- Row 5: Numbers 1-3 -->
+            <button class="key number" onclick="addToDisplay('1')">
+                <span class="key-label">1</span>
+            </button>
+            <button class="key number" onclick="addToDisplay('2')">
+                <span class="key-label">2</span>
+            </button>
+            <button class="key number" onclick="addToDisplay('3')">
+                <span class="key-label">3</span>
+            </button>
+            <button class="key const" onclick="addToDisplay('Math.E')">
+                <span class="key-label">e</span>
+                <span class="key-shortcut">E</span>
+            </button>
+            <button class="key operator" onclick="addToDisplay('+')">
+                <span class="key-label">+</span>
+                <span class="key-shortcut">+</span>
+            </button>
+
+            <!-- Row 6: 0, decimal, equals -->
+            <button class="key number wide" onclick="addToDisplay('0')">
+                <span class="key-label">0</span>
+            </button>
+            <button class="key number" onclick="addToDisplay('.')">
+                <span class="key-label">.</span>
+                <span class="key-shortcut">.</span>
+            </button>
+            <button class="key special" onclick="toggleHistory()">
+                <span class="key-label">HIST</span>
+                <span class="key-shortcut">H</span>
+            </button>
+            <button class="key equals" onclick="calculate()">
+                <span class="key-label">=</span>
+                <span class="key-shortcut">Enter</span>
+            </button>
+        </div>
+
+        <div class="controls" id="scientific-controls" style="display: none;">
+            <!-- Scientific keys will be populated by JavaScript -->
+        </div>
+
+        <div class="footer">
+            <div class="calculator-info">
+                <div class="calculator-model">RM-SCI v2.0</div>
+                <div>© 2024 Rafay Mehdi</div>
+            </div>
+            <button class="theme-toggle" id="theme-toggle">
+                <i class="fas fa-palette"></i>
+                <span>Theme</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Calculator State
+        let displayValue = '0';
+        let operationValue = '';
+        let memory = 0;
+        let history = [];
+        let isDegreeMode = true;
+        let isScientificMode = false;
+        let memoryStored = false;
+
+        // DOM Elements
+        const resultDisplay = document.getElementById('result-display');
+        const operationDisplay = document.getElementById('operation-display');
+        const historyPanel = document.getElementById('history-panel');
+        const historyList = document.getElementById('history-list');
+        const memoryIndicator = document.getElementById('memory-indicator');
+        const angleModeBtn = document.getElementById('angle-mode');
+        const basicControls = document.getElementById('basic-controls');
+        const scientificControls = document.getElementById('scientific-controls');
+        const modeButtons = document.querySelectorAll('.mode-btn');
+
+        // Update display
+        function updateDisplay() {
+            resultDisplay.textContent = displayValue.length > 15 
+                ? displayValue.substring(0, 15) + '...' 
+                : displayValue;
+            operationDisplay.textContent = operationValue;
+            
+            // Update memory indicator
+            if (memoryStored) {
+                memoryIndicator.classList.add('active');
+                memoryIndicator.innerHTML = `<i class="fas fa-memory"></i> M = ${formatNumber(memory)}`;
+            } else {
+                memoryIndicator.classList.remove('active');
+            }
+        }
+
+        // Format number for display
+        function formatNumber(num) {
+            if (typeof num !== 'number') return num;
+            
+            if (num.toString().length > 10) {
+                return num.toExponential(6);
+            }
+            
+            // Remove trailing zeros after decimal
+            return parseFloat(num.toPrecision(12)).toString();
+        }
+
+        // Add value to display
+        function addToDisplay(value) {
+            if (displayValue === '0' || displayValue === 'Error' || displayValue === 'Infinity') {
+                displayValue = value;
+            } else {
+                displayValue += value;
+            }
+            
+            // Add animation to display
+            resultDisplay.classList.add('pulse');
+            setTimeout(() => resultDisplay.classList.remove('pulse'), 300);
+            
+            updateDisplay();
+        }
+
+        // Calculate result
+        function calculate() {
+            try {
+                let expression = displayValue;
+                
+                // Handle degree/radian conversion for trig functions
+                if (isDegreeMode) {
+                    expression = expression.replace(/Math\.sin\(/g, 'Math.sin(Math.PI/180*');
+                    expression = expression.replace(/Math\.cos\(/g, 'Math.cos(Math.PI/180*');
+                    expression = expression.replace(/Math\.tan\(/g, 'Math.tan(Math.PI/180*');
+                }
+                
+                // Close any open parentheses
+                const openParens = (expression.match(/\(/g) || []).length;
+                const closeParens = (expression.match(/\)/g) || []).length;
+                for (let i = 0; i < openParens - closeParens; i++) {
+                    expression += ')';
+                }
+                
+                // Replace constants
+                expression = expression.replace(/Math\.PI/g, Math.PI.toString());
+                expression = expression.replace(/Math\.E/g, Math.E.toString());
+                
+                // Handle percentage
+                expression = expression.replace(/(\d+(\.\d+)?)%/g, '($1/100)');
+                
+                // Handle factorial
+                expression = expression.replace(/(\d+)!/g, 'factorial($1)');
+                
+                // Handle square root with no parentheses
+                expression = expression.replace(/√(\d+)/g, 'Math.sqrt($1)');
+                
+                // Handle implied multiplication
+                expression = expression.replace(/(\d)(\()/g, '$1*$2');
+                expression = expression.replace(/\)(\d)/g, ')*$1');
+                
+                // Evaluate
+                const result = eval(expression);
+                
+                if (isNaN(result) || !isFinite(result)) {
+                    throw new Error('Invalid calculation');
+                }
+                
+                // Add to history
+                addToHistory(displayValue, result);
+                
+                // Update display
+                operationValue = displayValue + ' =';
+                displayValue = formatNumber(result);
+                updateDisplay();
+                
+            } catch (error) {
+                displayValue = 'Error';
+                operationValue = '';
+                updateDisplay();
+                
+                setTimeout(() => {
+                    displayValue = '0';
+                    updateDisplay();
+                }, 1500);
+            }
+        }
+
+        // Factorial function
+        function factorial(n) {
+            n = parseInt(n);
+            if (n < 0) return NaN;
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        // Clear all
+        function clearAll() {
+            displayValue = '0';
+            operationValue = '';
+            updateDisplay();
+        }
+
+        // Clear entry
+        function clearEntry() {
+            displayValue = '0';
+            updateDisplay();
+        }
+
+        // Memory functions
+        function memoryClear() {
+            memory = 0;
+            memoryStored = false;
+            updateDisplay();
+        }
+
+        function memoryRecall() {
+            displayValue = formatNumber(memory);
+            updateDisplay();
+        }
+
+        function memoryAdd() {
+            try {
+                const currentValue = eval(displayValue);
+                if (!isNaN(currentValue)) {
+                    memory += currentValue;
+                    memoryStored = true;
+                    updateDisplay();
+                }
+            } catch (error) {
+                // Ignore errors
+            }
+        }
+
+        // History functions
+        function addToHistory(expression, result) {
+            const historyItem = {
+                expression: expression,
+                result: result,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            
+            history.unshift(historyItem);
+            updateHistory();
+            
+            // Store in localStorage
+            localStorage.setItem('calcHistory', JSON.stringify(history.slice(0, 20)));
+        }
+
+        function updateHistory() {
+            historyList.innerHTML = '';
+            
+            history.slice(0, 10).forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="history-expression">${item.expression}</div>
+                    <div class="history-result">= ${formatNumber(item.result)}</div>
+                `;
+                div.onclick = () => {
+                    displayValue = formatNumber(item.result);
+                    updateDisplay();
+                };
+                historyList.appendChild(div);
+            });
+        }
+
+        function toggleHistory() {
+            const isVisible = historyPanel.style.display === 'block';
+            historyPanel.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                updateHistory();
+            }
+        }
+
+        function clearHistory() {
+            history = [];
+            updateHistory();
+            localStorage.removeItem('calcHistory');
+        }
+
+        // Toggle degree/radian mode
+        function toggleAngleMode() {
+            isDegreeMode = !isDegreeMode;
+            angleModeBtn.innerHTML = `<i class="fas fa-protractor"></i> ${isDegreeMode ? 'DEG' : 'RAD'}`;
+            angleModeBtn.style.background = isDegreeMode 
+                ? 'rgba(255, 209, 102, 0.1)' 
+                : 'rgba(108, 99, 255, 0.1)';
+            angleModeBtn.style.color = isDegreeMode 
+                ? 'var(--warning)' 
+                : 'var(--accent)';
+        }
+
+        // Toggle calculator mode
+        function setCalculatorMode(mode) {
+            modeButtons.forEach(btn => btn.classList.remove('active'));
+            
+            if (mode === 'basic') {
+                basicControls.style.display = 'grid';
+                scientificControls.style.display = 'none';
+                document.getElementById('basic-mode').classList.add('active');
+                isScientificMode = false;
+            } else if (mode === 'scientific') {
+                basicControls.style.display = 'none';
+                scientificControls.style.display = 'grid';
+                document.getElementById('scientific-mode').classList.add('active');
+                isScientificMode = true;
+                initScientificControls();
+            } else {
+                basicControls.style.display = 'grid';
+                scientificControls.style.display = 'none';
+                document.getElementById('programmer-mode').classList.add('active');
+                isScientificMode = false;
+            }
+        }
+
+        // Initialize scientific controls
+        function initScientificControls() {
+            if (scientificControls.children.length > 0) return;
+            
+            const scientificKeys = [
+                // Row 1
+                { label: 'sin', action: 'Math.sin(', class: 'trig', shortcut: 'S' },
+                { label: 'cos', action: 'Math.cos(', class: 'trig', shortcut: 'C' },
+                { label: 'tan', action: 'Math.tan(', class: 'trig', shortcut: 'T' },
+                { label: 'sin⁻¹', action: 'Math.asin(', class: 'trig', shortcut: 'Shift+S' },
+                { label: 'cos⁻¹', action: 'Math.acos(', class: 'trig', shortcut: 'Shift+C' },
+                
+                // Row 2
+                { label: 'tan⁻¹', action: 'Math.atan(', class: 'trig', shortcut: 'Shift+T' },
+                { label: 'log', action: 'Math.log(', class: 'function', shortcut: 'L' },
+                { label: 'log₁₀', action: 'Math.log10(', class: 'function', shortcut: 'G' },
+                { label: 'ln', action: 'Math.log(', class: 'function', shortcut: 'N' },
+                { label: 'eˣ', action: 'Math.exp(', class: 'function', shortcut: 'E' },
+                
+                // Row 3
+                { label: '10ˣ', action: 'Math.pow(10,', class: 'function', shortcut: 'Shift+E' },
+                { label: '|x|', action: 'Math.abs(', class: 'function', shortcut: 'A' },
+                { label: '⌊x⌋', action: 'Math.floor(', class: 'function', shortcut: 'F' },
+                { label: '⌈x⌉', action: 'Math.ceil(', class: 'function', shortcut: 'Shift+F' },
+                { label: 'n!', action: '!', class: 'function', shortcut: '!' },
+                
+                // Row 4
+                { label: 'π', action: 'Math.PI', class: 'const', shortcut: 'P' },
+                { label: 'e', action: 'Math.E', class: 'const', shortcut: 'E' },
+                { label: 'Rand', action: 'Math.random()', class: 'const', shortcut: 'R' },
+                { label: '(', action: '(', class: 'function', shortcut: '(' },
+                { label: ')', action: ')', class: 'function', shortcut: ')' },
+                
+                // Row 5 (shared with basic controls)
+            ];
+            
+            scientificKeys.forEach(key => {
+                const button = document.createElement('button');
+                button.className = `key ${key.class}`;
+                button.innerHTML = `
+                    <span class="key-label">${key.label}</span>
+                    <span class="key-shortcut">${key.shortcut}</span>
+                `;
+                button.onclick = () => addToDisplay(key.action);
+                scientificControls.appendChild(button);
+            });
+            
+            // Add basic number keys
+            const basicKeys = ['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'];
+            basicKeys.forEach(key => {
+                const button = document.createElement('button');
+                if (key === '=') {
+                    button.className = 'key equals';
+                    button.onclick = calculate;
+                } else if (['+','-','*','/'].includes(key)) {
+                    button.className = 'key operator';
+                    button.onclick = () => addToDisplay(key === '*' ? '*' : key);
+                } else if (key === '.') {
+                    button.className = 'key number';
+                    button.onclick = () => addToDisplay('.');
+                } else {
+                    button.className = 'key number';
+                    button.onclick = () => addToDisplay(key);
+                }
+                button.innerHTML = `<span class="key-label">${key}</span>`;
+                scientificControls.appendChild(button);
+            });
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            // Prevent default for calculator keys
+            if ('0123456789+-*/.=()%'.includes(key)) {
+                event.preventDefault();
+            }
+            
+            // Numbers
+            if (key >= '0' && key <= '9') {
+                addToDisplay(key);
+            }
+            
+            // Operators
+            else if (key === '+') addToDisplay('+');
+            else if (key === '-') addToDisplay('-');
+            else if (key === '*') addToDisplay('*');
+            else if (key === '/') addToDisplay('/');
+            else if (key === '.') addToDisplay('.');
+            else if (key === '(') addToDisplay('(');
+            else if (key === ')') addToDisplay(')');
+            else if (key === '%') addToDisplay('%');
+            
+            // Equals / Enter
+            else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calculate();
+            }
+            
+            // Clear
+            else if (key === 'Escape') clearAll();
+            else if (key === 'Backspace') clearEntry();
+            
+            // Keyboard shortcuts
+            else if (key === 'h' || key === 'H') toggleHistory();
+            else if (key === 'r' || key === 'R') toggleAngleMode();
+            else if (key === 'm' || key === 'M') memoryAdd();
+            
+            // Scientific functions with Shift
+            else if (event.shiftKey) {
+                if (key === 'S') addToDisplay('Math.asin(');
+                else if (key === 'C') addToDisplay('Math.acos(');
+                else if (key === 'T') addToDisplay('Math.atan(');
+            }
+        });
+
+        // Theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            const root = document.documentElement;
+            const currentBg = getComputedStyle(root).getPropertyValue('--primary').trim();
+            
+            if (currentBg === '#2A2D43') {
+                // Switch to dark theme
+                root.style.setProperty('--primary', '#1A1A1A');
+                root.style.setProperty('--secondary', '#0D0D0D');
+                root.style.setProperty('--accent', '#00D4AA');
+                root.style.setProperty('--key-bg', '#2A2A2A');
+                document.body.style.background = 'linear-gradient(135deg, #000000, #1A1A1A)';
+            } else if (currentBg === '#1A1A1A') {
+                // Switch to light theme
+                root.style.setProperty('--primary', '#F5F5F5');
+                root.style.setProperty('--secondary', '#FFFFFF');
+                root.style.setProperty('--accent', '#6C63FF');
+                root.style.setProperty('--text', '#333333');
+                root.style.setProperty('--text-secondary', '#666666');
+                root.style.setProperty('--key-bg', '#E0E0E0');
+                root.style.setProperty('--key-hover', '#D0D0D0');
+                document.body.style.background = 'linear-gradient(135deg, #E0E0E0, #F5F5F5)';
+            } else {
+                // Switch back to default
+                root.style.setProperty('--primary', '#2A2D43');
+                root.style.setProperty('--secondary', '#1C1E2E');
+                root.style.setProperty('--accent', '#6C63FF');
+                root.style.setProperty('--text', '#FFFFFF');
+                root.style.setProperty('--text-secondary', '#B0B3C1');
+                root.style.setProperty('--key-bg', '#2E3148');
+                document.body.style.background = 'linear-gradient(135deg, #0F0C29, #302B63, #24243E)';
+            }
+        });
+
+        // Mode switch event listeners
+        document.getElementById('basic-mode').addEventListener('click', () => setCalculatorMode('basic'));
+        document.getElementById('scientific-mode').addEventListener('click', () => setCalculatorMode('scientific'));
+        document.getElementById('programmer-mode').addEventListener('click', () => setCalculatorMode('programmer'));
+        
+        // Angle mode toggle
+        angleModeBtn.addEventListener('click', toggleAngleMode);
+        
+        // Clear history button
+        document.getElementById('clear-history').addEventListener('click', clearHistory);
+
+        // Load history from localStorage
+        const savedHistory = localStorage.getItem('calcHistory');
+        if (savedHistory) {
+            history = JSON.parse(savedHistory);
+            updateHistory();
+        }
+
+        // Initialize calculator
+        updateDisplay();
+        updateHistory();
+    </script>
+</body>
+</html>
